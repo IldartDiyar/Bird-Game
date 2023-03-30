@@ -65,3 +65,13 @@ body{
     height: 300px;
     position: absolute;
 }
+.pause{
+    background-color: black;
+    z-index: +5;
+}
+.text-pause{
+    visibility: none;
+    font-size: 48px;
+    color: coral;
+    z-index: +6;
+}
