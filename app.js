@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const bird = document.querySelector(".bird");
   const gameDisplay = document.querySelector(".game-container");
   const ground = document.querySelector(".ground-moving");
+  const stopMessage = document.querySelector(".stop-message");
   // const obstacles = [];
 
   const birdLeft = 220;
@@ -9,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const gravity = 3;
   let isGameOver = false;
   let isPaused = false;
+
   // let afterPause = false;
   const gap = 430;
   let obstacleGeneratorId;
@@ -16,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // let frameCount = 0;
   // let startTime = Date.now();
+  let live = 3;
 
   function startGame() {
     startGameId = setTimeout(() => {
@@ -32,9 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
   startGame();
 
   function control(e) {
-   if (e.code === "Space" && !isPaused) {
+    if (e.code === "Space" && !isPaused) {
       jump();
-    } else if (e.code === "KeyP") {
+    } else if (e.code === "KeyP" && !isGameOver) {
       togglePause();
     }
   }
@@ -63,9 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
     topObstacle.style.bottom = obstacleBottom + gap + "px";
 
     function moveObstacle() {
-      let movement = 2
-      if (isPaused){
-        movement = 0
+      let movement = 2;
+      if (isPaused || isGameOver) {
+        movement = 0;
       }
       obstacleLeft -= movement;
       obstacle.style.left = obstacleLeft + "px";
@@ -85,18 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
         isCollide(bird, topObstacle) ||
         birdBottom < 0
       ) {
-        // console.log(gameDisplay.children);
-        // console.log(gameDisplay.children.length);
-        if (gameDisplay.children.length === 6 && gameDisplay.children[4] !== obstacle && gameDisplay.children[5] != topObstacle ) {
-          gameDisplay.removeChild(gameDisplay.children[5]);
-          gameDisplay.removeChild(gameDisplay.children[4]);
-        }
         gameOver();
         clearInterval(timerId);
-        // clearTimeoutafterPause(obstacleGeneratorId);
       }
     }
-    // obstacleGeneratorId
     let timerId = setInterval(moveObstacle, 20);
     if (!isGameOver) {
       obstacleGeneratorId = setTimeout(generateObstacle, 3000);
@@ -104,10 +99,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   generateObstacle();
-
   function gameOver() {
     isGameOver = true;
+    clearTimeout(startGameId);
+    clearTimeout(obstacleGeneratorId);
     document.removeEventListener("keydown", control);
+    live = live - 1;
+    console.log(live);
+    if (live >= 0) {
+      const obstacles = gameDisplay.querySelectorAll(".topObstacle, .obstacle");
+
+      obstacles.forEach((obstacle) => obstacle.remove());
+      birdBottom = 150;
+      // bird.style.display = "none";
+      // setTimeout(recoverBird(), 1000);
+      setTimeout(() => {
+        startGame();
+        isGameOver = false;
+        generateObstacle();
+        document.addEventListener("keydown", control);
+      }, 1500);
+      return;
+    }
+    stopMessage.style.backgroundImage = "url('Daco_2680778.png')";
+    stopMessage.innerHTML = "";
+    stopMessage.style.display = "block";
     ground.classList.add("ground");
     ground.classList.remove("ground-moving");
     setTimeout(() => {
@@ -115,11 +131,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
   }
   function togglePause() {
-    // console.log(isPaused);
     if (!isPaused) {
       clearTimeout(startGameId);
       clearTimeout(obstacleGeneratorId);
-      // document.removeEventListener("keydown", control);
+      stopMessage.style.display = "block";
+      console.log(stopMessage);
       ground.classList.add("ground");
       ground.classList.remove("ground-moving");
       isPaused = true;
@@ -127,6 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
       isPaused = false;
       startGame();
       setTimeout(generateObstacle, 3000);
+      stopMessage.style.display = "none";
       ground.classList.remove("ground");
       ground.classList.add("ground-moving");
       document.addEventListener("keydown", control);
