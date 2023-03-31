@@ -1,134 +1,137 @@
 document.addEventListener("DOMContentLoaded", () => {
   const bird = document.querySelector(".bird");
   const gameDisplay = document.querySelector(".game-container");
-  const ground = document.querySelector(".ground");
-  const textPause = document.querySelector(".text-pause");
-  let birdLeft = 220;
+  const ground = document.querySelector(".ground-moving");
+  // const obstacles = [];
+
+  const birdLeft = 220;
   let birdBottom = 100;
-  let gravity = 2;
+  const gravity = 3;
   let isGameOver = false;
-  let gap = 430;
-  let gameTimerId;
-  let obstacleTimerId;
+  let isPaused = false;
+  // let afterPause = false;
+  const gap = 430;
   let obstacleGeneratorId;
-  var scoreBoard = document.getElementById("Score");
-  let score = 0;
+  let startGameId;
+
+  // let frameCount = 0;
+  // let startTime = Date.now();
 
   function startGame() {
-    birdBottom -= gravity;
-    bird.style.bottom = birdBottom + "px";
-    bird.style.left = birdLeft + "px";
+    startGameId = setTimeout(() => {
+      birdBottom -= gravity;
+      bird.style.bottom = birdBottom + "px";
+      bird.style.left = birdLeft + "px";
+      // frameCount++;
+      // const elapsed = (Date.now() - startTime) / 1000;
+      // const fps = Math.round(frameCount / elapsed);
+      // console.log(fps);
+      startGame();
+    }, 20);
   }
+  startGame();
 
   function control(e) {
-    if (e.code === "Space") {
+   if (e.code === "Space" && !isPaused) {
       jump();
-    }
-    if (e.code === "KeyP") {
-      pauseGame();
-    }
-    if (e.code === "KeyR") {
-      resumeGame();
+    } else if (e.code === "KeyP") {
+      togglePause();
     }
   }
-  let obstaclesArr = [];
+
   function jump() {
-    if (birdBottom > 480 || isGameOver) {
-      return;
-    }
-    birdBottom += 50;
-    bird.style.birdBottom = birdBottom + "px";
+    if (birdBottom < 500) birdBottom += 50;
+    bird.style.bottom = birdBottom + "px";
   }
+  document.addEventListener("keydown", control);
 
   function generateObstacle() {
     let obstacleLeft = 500;
     let randomHeight = Math.random() * 60;
     let obstacleBottom = randomHeight;
-
     const obstacle = document.createElement("div");
-    obstacle.classList.add("obstacle");
-    gameDisplay.appendChild(obstacle);
-    obstacle.style.left = obstacleLeft + "px";
-    obstacle.style.bottom = obstacleBottom + "px";
-
     const topObstacle = document.createElement("div");
-    topObstacle.classList.add("topobstacle");
+    if (!isGameOver) {
+      obstacle.classList.add("obstacle");
+      topObstacle.classList.add("topObstacle");
+    }
+    gameDisplay.appendChild(obstacle);
     gameDisplay.appendChild(topObstacle);
+    obstacle.style.left = obstacleLeft + "px";
     topObstacle.style.left = obstacleLeft + "px";
+    obstacle.style.bottom = obstacleBottom + "px";
     topObstacle.style.bottom = obstacleBottom + gap + "px";
 
-    obstaclesArr.push({ topObstacle, obstacle });
-    // console.log(obstaclesArr);
-
-    function obstacleMove() {
-      obstacleLeft -= 2;
+    function moveObstacle() {
+      let movement = 2
+      if (isPaused){
+        movement = 0
+      }
+      obstacleLeft -= movement;
       obstacle.style.left = obstacleLeft + "px";
       topObstacle.style.left = obstacleLeft + "px";
-      if (obstacleLeft === -60) {
-        gameDisplay.removeChild(obstacle);
-        gameDisplay.removeChild(topObstacle);
+
+      if (obstacleLeft < -60) {
+        clearInterval(timerId);
+        if (gameDisplay.contains(obstacle)) {
+          gameDisplay.removeChild(obstacle);
+        }
+        if (gameDisplay.contains(topObstacle)) {
+          gameDisplay.removeChild(topObstacle);
+        }
       }
       if (
         isCollide(bird, obstacle) ||
         isCollide(bird, topObstacle) ||
-        birdBottom === 0
+        birdBottom < 0
       ) {
+        // console.log(gameDisplay.children);
+        // console.log(gameDisplay.children.length);
+        if (gameDisplay.children.length === 6 && gameDisplay.children[4] !== obstacle && gameDisplay.children[5] != topObstacle ) {
+          gameDisplay.removeChild(gameDisplay.children[5]);
+          gameDisplay.removeChild(gameDisplay.children[4]);
+        }
         gameOver();
-        clearInterval(obstacleTimerId);
-        clearTimeout(obstacleGeneratorId);
+        clearInterval(timerId);
+        // clearTimeoutafterPause(obstacleGeneratorId);
       }
     }
-
-    if (isGameOver) {
-      return;
-    } else {
-      score++;
-      scoreBoard.innerHTML = score - 1;
+    // obstacleGeneratorId
+    let timerId = setInterval(moveObstacle, 20);
+    if (!isGameOver) {
+      obstacleGeneratorId = setTimeout(generateObstacle, 3000);
     }
-
-    obstacleTimerId = setInterval(obstacleMove, 20);
-
-    obstacleGeneratorId = setTimeout(generateObstacle, 3000);
   }
 
-  function pauseGame() {
-    clearInterval(gameTimerId);
-    clearInterval(obstacleTimerId);
-    clearTimeout(obstacleGeneratorId);
-    for (let i = 0; i != obstaclesArr.length; i++) {
-      element = obstaclesArr[i];
-      console.log(obstaclesArr.length);
-      element.obstacle.remove();
-      element.topObstacle.remove();
-    }
-    // obstaclesArr.forEach((element) => {
-    //   gameDisplay.removeChild(element.obstacle);
-    //   gameDisplay.removeChild(element.topObstacle);
-
-    //   console.log(obstaclesArr.length);
-    // });
-    textPause.style.visibility = "visible";
-    obstaclesArr = [];
-    isGameOver = true;
-  }
-
-  function resumeGame() {
-    isGameOver = false;
-    document.addEventListener("keyup", control);
-    gameTimerId = setInterval(startGame, 20);
-    generateObstacle();
-  }
+  generateObstacle();
 
   function gameOver() {
-    console.log("Game Over!");
-    clearInterval(gameTimerId);
     isGameOver = true;
-    document.removeEventListener("keyup", control);
+    document.removeEventListener("keydown", control);
+    ground.classList.add("ground");
+    ground.classList.remove("ground-moving");
+    setTimeout(() => {
+      bird.remove();
+    }, 1000);
   }
-
-  document.addEventListener("keyup", control);
-  gameTimerId = setInterval(startGame, 20);
-  generateObstacle();
+  function togglePause() {
+    // console.log(isPaused);
+    if (!isPaused) {
+      clearTimeout(startGameId);
+      clearTimeout(obstacleGeneratorId);
+      // document.removeEventListener("keydown", control);
+      ground.classList.add("ground");
+      ground.classList.remove("ground-moving");
+      isPaused = true;
+    } else {
+      isPaused = false;
+      startGame();
+      setTimeout(generateObstacle, 3000);
+      ground.classList.remove("ground");
+      ground.classList.add("ground-moving");
+      document.addEventListener("keydown", control);
+    }
+  }
 });
 function isCollide(a, b) {
   var aRect = a.getBoundingClientRect();
