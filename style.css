@@ -136,3 +136,14 @@ body {
         transform: translateY(-3px);
     }
 }
+.Score{
+    top: 250px; left: 15px; width: 250px;position: absolute;
+    font-size: 25px;
+}
+.Hearts{
+    position: absolute;
+    top: 300px; left: 70px; 
+}
+.Hearts img{
+    width: 60px;
+}

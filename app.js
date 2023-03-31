@@ -3,7 +3,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const gameDisplay = document.querySelector(".game-container");
   const ground = document.querySelector(".ground-moving");
   const stopMessage = document.querySelector(".stop-message");
+  const ScoreBoard = document.getElementById("scoreBoard");
+  const heart = document.getElementById("heart");
   // const obstacles = [];
+  let score = 0;
 
   const birdLeft = 220;
   let birdBottom = 100;
@@ -15,10 +18,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const gap = 430;
   let obstacleGeneratorId;
   let startGameId;
+  let startCountingId;
 
   // let frameCount = 0;
   // let startTime = Date.now();
   let live = 3;
+
+  function startCounting() {
+    score = score + 100;
+    ScoreBoard.innerHTML = score;
+    startCountingId = setTimeout(startCounting, 1500);
+  }
+  startCountingId = setTimeout(startCounting, 1500);
 
   function startGame() {
     startGameId = setTimeout(() => {
@@ -92,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
         clearInterval(timerId);
       }
     }
+
     let timerId = setInterval(moveObstacle, 20);
     if (!isGameOver) {
       obstacleGeneratorId = setTimeout(generateObstacle, 3000);
@@ -103,12 +115,15 @@ document.addEventListener("DOMContentLoaded", () => {
     isGameOver = true;
     clearTimeout(startGameId);
     clearTimeout(obstacleGeneratorId);
+    clearTimeout(startCountingId);
     document.removeEventListener("keydown", control);
     live = live - 1;
     console.log(live);
-    if (live >= 0) {
+    if (live > 0) {
       const obstacles = gameDisplay.querySelectorAll(".topObstacle, .obstacle");
 
+      heart.lastElementChild.style.display = "none";
+      heart.removeChild(heart.lastElementChild);
       obstacles.forEach((obstacle) => obstacle.remove());
       birdBottom = 150;
       // bird.style.display = "none";
@@ -117,15 +132,20 @@ document.addEventListener("DOMContentLoaded", () => {
         startGame();
         isGameOver = false;
         generateObstacle();
+        startCountingId = setTimeout(startCounting, 1500);
         document.addEventListener("keydown", control);
       }, 1500);
       return;
     }
+    heart.lastElementChild.style.display = "none";
+    heart.removeChild(heart.lastElementChild);
+
     stopMessage.style.backgroundImage = "url('Daco_2680778.png')";
     stopMessage.innerHTML = "";
     stopMessage.style.display = "block";
     ground.classList.add("ground");
     ground.classList.remove("ground-moving");
+
     setTimeout(() => {
       bird.remove();
     }, 1000);
@@ -134,6 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!isPaused) {
       clearTimeout(startGameId);
       clearTimeout(obstacleGeneratorId);
+      clearTimeout(startCountingId);
       stopMessage.style.display = "block";
       console.log(stopMessage);
       ground.classList.add("ground");
@@ -144,6 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
       startGame();
       setTimeout(generateObstacle, 3000);
       stopMessage.style.display = "none";
+      setTimeout(startCounting, 1500);
       ground.classList.remove("ground");
       ground.classList.add("ground-moving");
       document.addEventListener("keydown", control);
