@@ -6,6 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const ScoreBoard = document.getElementById("scoreBoard");
   const timer = document.getElementById("Timer");
   const heart = document.getElementById("heart");
+  const Restart = document.getElementById("Restart");
+  Restart.onclick = () => {
+    location.reload();
+  };
   // const obstacles = [];
   let time = 0;
   let score = 0;
@@ -161,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
       clearTimeout(obstacleGeneratorId);
       clearTimeout(startCountingId);
       stopMessage.style.display = "block";
-      console.log(stopMessage);
+
       ground.classList.add("ground");
       ground.classList.remove("ground-moving");
       isPaused = true;
