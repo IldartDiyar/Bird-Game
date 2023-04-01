@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
       obstacleLeft -= movement;
       obstacle.style.left = obstacleLeft + "px";
       topObstacle.style.left = obstacleLeft + "px";
-      if (obstacleLeft === 180) {
+      if (obstacleLeft === 130) {
         score = score + 1;
         ScoreBoard.innerHTML = score;
       }
@@ -127,13 +127,12 @@ document.addEventListener("DOMContentLoaded", () => {
     clearTimeout(startCountingId);
     document.removeEventListener("keydown", control);
     live = live - 1;
-    console.log(live);
     if (live > 0) {
       const obstacles = gameDisplay.querySelectorAll(".topObstacle, .obstacle");
-
+      obstacles.forEach((obstacle) => obstacle.remove());
       heart.lastElementChild.style.display = "none";
       heart.removeChild(heart.lastElementChild);
-      obstacles.forEach((obstacle) => obstacle.remove());
+
       birdBottom = 150;
       // bird.style.display = "none";
       // setTimeout(recoverBird(), 1000);
@@ -150,6 +149,9 @@ document.addEventListener("DOMContentLoaded", () => {
     heart.removeChild(heart.lastElementChild);
 
     stopMessage.style.backgroundImage = "url('Daco_2680778.png')";
+    stopMessage.style.top = "228px";
+    stopMessage.style.left = "251px";
+    stopMessage.style.width = "5%";
     stopMessage.innerHTML = "";
     stopMessage.style.display = "block";
     ground.classList.add("ground");
