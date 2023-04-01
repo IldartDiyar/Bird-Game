@@ -11,13 +11,16 @@ body {
     left: 80px;
 }
 .stop-message{
-    width: 181px;
-    height: 100px;
+    width: -19%;
+    margin: 20px auto;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 0 15px 5px #fa0000;
     position: absolute;
     z-index: +8;
     display: none;
-    top: 350px;
-    left: 256px;
+    top: 145px;
+    left: 174px;
     background-size: 100% 100%;
 }
 .border-left {
@@ -69,6 +72,7 @@ body {
     height: 45px;
     left: 220px;
     bottom: 100px;
+   
     animation: fly 0.5s infinite alternate;
     animation-timing-function: ease-in-out;
 }
@@ -142,8 +146,22 @@ body {
 }
 .Hearts{
     position: absolute;
-    top: 300px; left: 70px; 
+    top: 350px; left: 70px; 
 }
 .Hearts img{
     width: 60px;
 }
+button {
+    top: 150px;
+    left: 40px;
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    /* margin: 4px 2px; */
+    cursor: pointer;
+    position: absolute;
+  }

@@ -4,8 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const ground = document.querySelector(".ground-moving");
   const stopMessage = document.querySelector(".stop-message");
   const ScoreBoard = document.getElementById("scoreBoard");
+  const timer = document.getElementById("Timer");
   const heart = document.getElementById("heart");
   // const obstacles = [];
+  let time = 0;
   let score = 0;
 
   const birdLeft = 220;
@@ -25,11 +27,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let live = 3;
 
   function startCounting() {
-    score = score + 100;
-    ScoreBoard.innerHTML = score;
-    startCountingId = setTimeout(startCounting, 1500);
+    time = time + 1;
+    timer.innerHTML = time;
+    startCountingId = setTimeout(startCounting, 1000);
   }
-  startCountingId = setTimeout(startCounting, 1500);
+  startCountingId = setTimeout(startCounting, 1000);
 
   function startGame() {
     startGameId = setTimeout(() => {
@@ -84,7 +86,10 @@ document.addEventListener("DOMContentLoaded", () => {
       obstacleLeft -= movement;
       obstacle.style.left = obstacleLeft + "px";
       topObstacle.style.left = obstacleLeft + "px";
-
+      if (obstacleLeft === 180) {
+        score = score + 1;
+        ScoreBoard.innerHTML = score;
+      }
       if (obstacleLeft < -60) {
         clearInterval(timerId);
         if (gameDisplay.contains(obstacle)) {
